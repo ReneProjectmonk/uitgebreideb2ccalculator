@@ -74,10 +74,8 @@
   </label>
 
   <div class="result" id="output">
-    Maandelijkse omzet: €0<br>
     Jaaromzet: €0<br>
-    Aantal orders/maand: 0<br>
-    Aantal orders/jaar: 0<br>
+    Totaal aantal orders: 0<br>
     Unieke klanten/maand: 0<br>
     CLV: €0
   </div>
@@ -95,30 +93,31 @@
       const aov = parseFloat(document.getElementById("aov").value);
       const frequency = parseFloat(document.getElementById("frequency").value);
 
-      const monthlyCustomers = monthlyVisitors * conversionRate;
-      const monthlyOrders = monthlyCustomers * frequency;
-      const monthlyRevenue = monthlyOrders * aov;
+      const monthlyNewCustomers = monthlyVisitors * conversionRate;
+      let totalOrders = 0;
+      let totalRevenue = 0;
 
-      const yearlyCustomers = monthlyCustomers * 9; // alleen eerste 9 maanden tellen volledig mee
-      const yearlyOrders = yearlyCustomers * frequency;
-      const yearlyRevenue = yearlyOrders * aov;
+      for (let month = 1; month <= 12; month++) {
+        const activeCustomers = (month <= 9) ? monthlyNewCustomers * frequency : monthlyNewCustomers;
+        totalOrders += activeCustomers;
+        totalRevenue += activeCustomers * aov;
+      }
 
       const clv = aov * frequency;
 
       output.innerHTML = `
-        Maandelijkse omzet: €${Math.round(monthlyRevenue).toLocaleString('nl-NL')}<br>
-        Jaaromzet: €${Math.round(yearlyRevenue).toLocaleString('nl-NL')}<br>
-        Aantal orders/maand: ${Math.round(monthlyOrders)}<br>
-        Aantal orders/jaar: ${Math.round(yearlyOrders)}<br>
-        Unieke klanten/maand: ${Math.round(monthlyCustomers)}<br>
+        Jaaromzet: €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
+        Totaal aantal orders: ${Math.round(totalOrders)}<br>
+        Unieke klanten/maand: ${Math.round(monthlyNewCustomers)}<br>
         CLV: €${clv.toFixed(2)}
       `;
 
       explanation.innerHTML = `
         <strong>Berekening:</strong><br>
-        Elke maand komen ${monthlyVisitors} bezoekers, waarvan ${conversionRate * 100}% converteert = ${Math.round(monthlyCustomers)} nieuwe klanten.<br>
-        Elke klant bestelt gemiddeld ${frequency}× per jaar met een orderwaarde van €${aov}.<br>
-        We rekenen met 9 maanden voor herhaalgedrag. Jaaromzet = aantal klanten × aankopen × orderwaarde.
+        Elke maand komen ${monthlyVisitors} bezoekers, waarvan ${(conversionRate * 100).toFixed(2)}% converteert = ${Math.round(monthlyNewCustomers)} nieuwe klanten.<br>
+        Elke klant doet gemiddeld ${frequency} aankopen/jaar à €${aov}.<br>
+        In maand 1 t/m 9 telt ook het herhaalgedrag mee. Vanaf maand 10 alleen de eerste aankoop.<br>
+        Jaaromzet = som van alle bestellingen × orderwaarde.
       `;
     }
 
