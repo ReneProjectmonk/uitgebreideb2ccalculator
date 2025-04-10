@@ -43,6 +43,13 @@
       font-weight: normal;
       font-size: 14px;
     }
+    .steps {
+      background-color: #f0f0ff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -84,6 +91,25 @@
   </div>
 
   <div class="explanation" id="explanation"></div>
+
+  <div class="steps" id="steps">
+    <strong>✅ Stap voor stap uitleg:</strong><br><br>
+    <strong>1. Eerste aankopen berekenen:</strong><br>
+    Nieuwe klanten per maand = bezoekers × conversiepercentage<br>
+    → Bijvoorbeeld: 8.000 × 3,5% = 280 klanten<br>
+    → 280 klanten × €90 = €25.200 omzet per maand<br>
+    → €25.200 × 12 maanden = €302.400 jaarlijkse omzet uit eerste aankopen<br><br>
+    <strong>2. Herhaalomzet berekenen:</strong><br>
+    Elke klant doet gemiddeld 1,67 bestellingen per jaar → dus 0,67 extra bestellingen<br>
+    Herhaalorders worden geteld voor maand 1 t/m 9:<br>
+    → 280 klanten × 0,67 × 9 maanden = 1.687 extra bestellingen<br>
+    → 1.687 × €90 = €151.830 herhaalomzet<br><br>
+    <strong>🔚 Resultaat:</strong><br>
+    Eerste aankopen = €302.400<br>
+    Herhaalomzet = €151.830<br>
+    Totaal = €454.230<br>
+    Dit komt praktisch overeen met wat de calculator berekent!
+  </div>
 
   <script>
     const inputs = document.querySelectorAll("input");
