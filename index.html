@@ -75,8 +75,11 @@
 
   <div class="result" id="output">
     Jaaromzet: €0<br>
+    Maandelijkse omzet (excl. herhaal): €0<br>
+    Herhaalomzet: €0<br>
     Totaal aantal orders: 0<br>
     Unieke klanten/maand: 0<br>
+    Totale unieke klanten/jaar: 0<br>
     CLV: €0
   </div>
 
@@ -94,6 +97,9 @@
       const frequency = parseFloat(document.getElementById("frequency").value);
 
       const monthlyNewCustomers = monthlyVisitors * conversionRate;
+      const monthlyBaseRevenue = monthlyNewCustomers * aov;
+      const totalUniqueCustomers = monthlyNewCustomers * 12;
+
       let totalOrders = 0;
       let totalRevenue = 0;
 
@@ -104,11 +110,15 @@
       }
 
       const clv = aov * frequency;
+      const herhaalOmzet = totalRevenue - (monthlyBaseRevenue * 12);
 
       output.innerHTML = `
         Jaaromzet: €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
+        Maandelijkse omzet (excl. herhaal): €${Math.round(monthlyBaseRevenue).toLocaleString('nl-NL')}<br>
+        Herhaalomzet: €${Math.round(herhaalOmzet).toLocaleString('nl-NL')}<br>
         Totaal aantal orders: ${Math.round(totalOrders)}<br>
         Unieke klanten/maand: ${Math.round(monthlyNewCustomers)}<br>
+        Totale unieke klanten/jaar: ${Math.round(totalUniqueCustomers)}<br>
         CLV: €${clv.toFixed(2)}
       `;
 
@@ -117,6 +127,8 @@
         Elke maand komen ${monthlyVisitors} bezoekers, waarvan ${(conversionRate * 100).toFixed(2)}% converteert = ${Math.round(monthlyNewCustomers)} nieuwe klanten.<br>
         Elke klant doet gemiddeld ${frequency} aankopen/jaar à €${aov}.<br>
         In maand 1 t/m 9 telt ook het herhaalgedrag mee. Vanaf maand 10 alleen de eerste aankoop.<br>
+        Maandelijkse omzet = nieuwe klanten × orderwaarde.<br>
+        Herhaalomzet = totaal aantal extra aankopen × orderwaarde.<br>
         Jaaromzet = som van alle bestellingen × orderwaarde.
       `;
     }
