@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>DÉCAAR CLV & Omzet Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+    .result, .baseline, .explanation {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .baseline {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+    }
+    .explanation {
+      background-color: #eef;
+      font-weight: normal;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>DÉCAAR Omzet & CLV Calculator</h1>
+
+  <div class="baseline">
+    <h3>📌 Huidige situatie (2024)</h3>
+    Bezoekers per maand: ± 6.500<br>
+    Conversiepercentage: ± 3,1%<br>
+    Gemiddelde orderwaarde: €75<br>
+    Unieke klanten (B2C): 1.306<br>
+    Bestellingen (B2C): 2.020<br>
+    Aankopen per klant: 1,55<br>
+    CLV: €116<br>
+    Totale B2C omzet: ± €151.500
+  </div>
+
+  <label>Bezoekers per maand:
+    <input type="number" id="visitors" value="8000">
+  </label>
+  <label>Conversiepercentage (%):
+    <input type="number" id="conversion" step="0.1" value="3.5">
+  </label>
+  <label>Gemiddelde orderwaarde (€):
+    <input type="number" id="aov" value="90">
+  </label>
+  <label>Gemiddeld aantal aankopen per klant (per jaar):
+    <input type="number" id="frequency" step="0.01" value="1.67">
+  </label>
+
+  <div class="result" id="output">
+    Maandelijkse omzet: €0<br>
+    Jaaromzet: €0<br>
+    Aantal orders/maand: 0<br>
+    Aantal orders/jaar: 0<br>
+    Unieke klanten/maand: 0<br>
+    CLV: €0
+  </div>
+
+  <div class="explanation" id="explanation"></div>
+
+  <script>
+    const inputs = document.querySelectorAll("input");
+    const output = document.getElementById("output");
+    const explanation = document.getElementById("explanation");
+
+    function calculate() {
+      const monthlyVisitors = parseFloat(document.getElementById("visitors").value);
+      const conversionRate = parseFloat(document.getElementById("conversion").value) / 100;
+      const aov = parseFloat(document.getElementById("aov").value);
+      const frequency = parseFloat(document.getElementById("frequency").value);
+
+      const monthlyCustomers = monthlyVisitors * conversionRate;
+      const monthlyOrders = monthlyCustomers * frequency;
+      const monthlyRevenue = monthlyOrders * aov;
+
+      const yearlyCustomers = monthlyCustomers * 9; // alleen eerste 9 maanden tellen volledig mee
+      const yearlyOrders = yearlyCustomers * frequency;
+      const yearlyRevenue = yearlyOrders * aov;
+
+      const clv = aov * frequency;
+
+      output.innerHTML = `
+        Maandelijkse omzet: €${Math.round(monthlyRevenue).toLocaleString('nl-NL')}<br>
+        Jaaromzet: €${Math.round(yearlyRevenue).toLocaleString('nl-NL')}<br>
+        Aantal orders/maand: ${Math.round(monthlyOrders)}<br>
+        Aantal orders/jaar: ${Math.round(yearlyOrders)}<br>
+        Unieke klanten/maand: ${Math.round(monthlyCustomers)}<br>
+        CLV: €${clv.toFixed(2)}
+      `;
+
+      explanation.innerHTML = `
+        <strong>Berekening:</strong><br>
+        Elke maand komen ${monthlyVisitors} bezoekers, waarvan ${conversionRate * 100}% converteert = ${Math.round(monthlyCustomers)} nieuwe klanten.<br>
+        Elke klant bestelt gemiddeld ${frequency}× per jaar met een orderwaarde van €${aov}.<br>
+        We rekenen met 9 maanden voor herhaalgedrag. Jaaromzet = aantal klanten × aankopen × orderwaarde.
+      `;
+    }
+
+    inputs.forEach(input => input.addEventListener("input", calculate));
+    calculate();
+  </script>
+</body>
+</html>
