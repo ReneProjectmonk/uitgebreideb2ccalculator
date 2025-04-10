@@ -61,7 +61,8 @@
     Bestellingen (B2C): 2.020<br>
     Aankopen per klant: 1,55<br>
     CLV: €116<br>
-    Totale B2C omzet: ± €151.500
+    Totale B2C omzet (gerealiseerd): ± €151.500<br>
+    Potentieel op basis van verkeer: ± €181.350 (6500 × 3,1% × €75 × 12)
   </div>
 
   <label>Bezoekers per maand:
@@ -113,8 +114,8 @@
       output.innerHTML = `
         Jaaromzet: €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
         Maandelijkse omzet (excl. herhaal): €${Math.round(monthlyBaseRevenue).toLocaleString('nl-NL')}<br>
-        Herhaalomzet: €${Math.round(herhaalOmzet).toLocaleString('nl-NL')}<br>
-        Totaal aantal orders: ${Math.round(totalOrders)}<br>
+        Herhaalomzet per jaar: €${Math.round(herhaalOmzet).toLocaleString('nl-NL')}<br>
+        Totaal aantal orders per jaar: ${Math.round(totalOrders)}<br>
         Unieke klanten/maand: ${Math.round(monthlyNewCustomers)}<br>
         Totale unieke klanten/jaar: ${Math.round(totalUniqueCustomers)}<br>
         CLV: €${clv.toFixed(2)}
