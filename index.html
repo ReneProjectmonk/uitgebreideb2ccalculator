@@ -26,29 +26,26 @@
       margin-top: 4px;
       margin-bottom: 10px;
     }
-    .result, .baseline, .explanation {
+    .result, .baseline, .explanation, .steps {
       background-color: #e8f5e9;
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
-      font-weight: bold;
     }
     .baseline {
       background-color: #fff3cd;
       border: 1px solid #ffeeba;
       color: #856404;
+      font-weight: bold;
     }
-    .explanation {
+    .explanation, .steps {
       background-color: #eef;
       font-weight: normal;
       font-size: 14px;
     }
-    .steps {
-      background-color: #f0f0ff;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-      font-size: 14px;
+    .steps strong {
+      display: block;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -80,41 +77,15 @@
     <input type="number" id="frequency" step="0.01" value="1.67">
   </label>
 
-  <div class="result" id="output">
-    Jaaromzet: €0<br>
-    Maandelijkse omzet (excl. herhaal): €0<br>
-    Herhaalomzet: €0<br>
-    Totaal aantal orders: 0<br>
-    Unieke klanten/maand: 0<br>
-    Totale unieke klanten/jaar: 0<br>
-    CLV: €0
-  </div>
-
+  <div class="result" id="output"></div>
   <div class="explanation" id="explanation"></div>
-
-  <div class="steps" id="steps">
-    <strong>✅ Stap voor stap uitleg:</strong><br><br>
-    <strong>1. Eerste aankopen berekenen:</strong><br>
-    Nieuwe klanten per maand = bezoekers × conversiepercentage<br>
-    → Bijvoorbeeld: 8.000 × 3,5% = 280 klanten<br>
-    → 280 klanten × €90 = €25.200 omzet per maand<br>
-    → €25.200 × 12 maanden = €302.400 jaarlijkse omzet uit eerste aankopen<br><br>
-    <strong>2. Herhaalomzet berekenen:</strong><br>
-    Elke klant doet gemiddeld 1,67 bestellingen per jaar → dus 0,67 extra bestellingen<br>
-    Herhaalorders worden geteld voor maand 1 t/m 9:<br>
-    → 280 klanten × 0,67 × 9 maanden = 1.687 extra bestellingen<br>
-    → 1.687 × €90 = €151.830 herhaalomzet<br><br>
-    <strong>🔚 Resultaat:</strong><br>
-    Eerste aankopen = €302.400<br>
-    Herhaalomzet = €151.830<br>
-    Totaal = €454.230<br>
-    Dit komt praktisch overeen met wat de calculator berekent!
-  </div>
+  <div class="steps" id="steps"></div>
 
   <script>
     const inputs = document.querySelectorAll("input");
     const output = document.getElementById("output");
     const explanation = document.getElementById("explanation");
+    const steps = document.getElementById("steps");
 
     function calculate() {
       const monthlyVisitors = parseFloat(document.getElementById("visitors").value);
@@ -137,6 +108,7 @@
 
       const clv = aov * frequency;
       const herhaalOmzet = totalRevenue - (monthlyBaseRevenue * 12);
+      const extraOrders = Math.round(monthlyNewCustomers * (frequency - 1) * 9);
 
       output.innerHTML = `
         Jaaromzet: €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
@@ -156,6 +128,23 @@
         Maandelijkse omzet = nieuwe klanten × orderwaarde.<br>
         Herhaalomzet = totaal aantal extra aankopen × orderwaarde.<br>
         Jaaromzet = som van alle bestellingen × orderwaarde.
+      `;
+
+      steps.innerHTML = `
+        <strong>✅ Stap voor stap uitleg:</strong>
+        <strong>1. Eerste aankopen berekenen:</strong>
+        Nieuwe klanten per maand = ${monthlyVisitors} × ${(conversionRate * 100).toFixed(1)}% = ${Math.round(monthlyNewCustomers)} klanten<br>
+        → ${Math.round(monthlyNewCustomers)} × €${aov} = €${Math.round(monthlyBaseRevenue).toLocaleString('nl-NL')} omzet per maand<br>
+        → €${Math.round(monthlyBaseRevenue).toLocaleString('nl-NL')} × 12 maanden = €${Math.round(monthlyBaseRevenue * 12).toLocaleString('nl-NL')} jaarlijkse omzet uit eerste aankopen<br><br>
+        <strong>2. Herhaalomzet berekenen:</strong>
+        Gem. extra bestellingen per klant: ${frequency} - 1 = ${(frequency - 1).toFixed(2)}<br>
+        Herhaalorders maanden 1-9: ${Math.round(monthlyNewCustomers)} × ${(frequency - 1).toFixed(2)} × 9 = ${extraOrders} extra bestellingen<br>
+        → ${extraOrders} × €${aov} = €${Math.round(herhaalOmzet).toLocaleString('nl-NL')} herhaalomzet<br><br>
+        <strong>🔚 Resultaat:</strong><br>
+        Eerste aankopen = €${Math.round(monthlyBaseRevenue * 12).toLocaleString('nl-NL')}<br>
+        Herhaalomzet = €${Math.round(herhaalOmzet).toLocaleString('nl-NL')}<br>
+        Totaal = €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
+        Dit komt overeen met wat de calculator berekent!
       `;
     }
 
