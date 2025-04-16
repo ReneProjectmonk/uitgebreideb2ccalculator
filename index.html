@@ -114,8 +114,8 @@
       const extraOrders = Math.round(monthlyNewCustomers * (frequency - 1) * 9);
 
       output.innerHTML = `
-        Jaaromzet: €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
-        Maandelijkse omzet (excl. herhaal): €${Math.round(monthlyBaseRevenue).toLocaleString('nl-NL')}<br>
+        Jaaromzet (incl. herhaal): €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
+        Jaaromzet uit eerste aankopen: €${Math.round(monthlyBaseRevenue * 12).toLocaleString('nl-NL')}<br>
         Herhaalomzet per jaar: €${Math.round(herhaalOmzet).toLocaleString('nl-NL')}<br>
         Totaal aantal orders per jaar: ${Math.round(totalOrders)}<br>
         Unieke klanten/maand: ${Math.round(monthlyNewCustomers)}<br>
@@ -128,9 +128,8 @@
         Elke maand komen ${monthlyVisitors} bezoekers, waarvan ${(conversionRate * 100).toFixed(2)}% converteert = ${Math.round(monthlyNewCustomers)} nieuwe klanten.<br>
         Elke klant doet gemiddeld ${frequency} aankopen/jaar à €${aov}.<br>
         In maand 1 t/m 9 telt ook het herhaalgedrag mee. Vanaf maand 10 alleen de eerste aankoop.<br>
-        Maandelijkse omzet = nieuwe klanten × orderwaarde.<br>
-        Herhaalomzet = totaal aantal extra aankopen × orderwaarde.<br>
-        Jaaromzet = som van alle bestellingen × orderwaarde.
+        Jaaromzet = som van alle bestellingen × orderwaarde.<br>
+        Herhaalomzet = totaal aantal extra aankopen × orderwaarde.
       `;
 
       steps.innerHTML = `
