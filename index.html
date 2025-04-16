@@ -129,7 +129,10 @@
         Elke klant doet gemiddeld ${frequency} aankopen/jaar à €${aov}.<br>
         In maand 1 t/m 9 telt ook het herhaalgedrag mee. Vanaf maand 10 alleen de eerste aankoop.<br>
         Jaaromzet = som van alle bestellingen × orderwaarde.<br>
-        Herhaalomzet = totaal aantal extra aankopen × orderwaarde.
+        Herhaalomzet = totaal aantal extra aankopen × orderwaarde.<br>
+        Totale unieke klanten/jaar = nieuwe klanten/maand × 12<br>
+        Totaal aantal orders = alle aankopen in 12 maanden (inclusief herhaalaankopen)<br>
+        CLV = orderwaarde × aankopen per klant/jaar
       `;
 
       steps.innerHTML = `
@@ -142,6 +145,10 @@
         Gem. extra bestellingen per klant: ${frequency} - 1 = ${(frequency - 1).toFixed(2)}<br>
         Herhaalorders maanden 1-9: ${Math.round(monthlyNewCustomers)} × ${(frequency - 1).toFixed(2)} × 9 = ${extraOrders} extra bestellingen<br>
         → ${extraOrders} × €${aov} = €${Math.round(herhaalOmzet).toLocaleString('nl-NL')} herhaalomzet<br><br>
+        <strong>3. Unieke klanten & CLV:</strong><br>
+        Totale unieke klanten/jaar = ${Math.round(monthlyNewCustomers)} × 12 = ${Math.round(totalUniqueCustomers)}<br>
+        Totaal aantal orders/jaar = ${Math.round(totalOrders)}<br>
+        CLV = €${aov} × ${frequency} = €${clv.toFixed(2)}<br><br>
         <strong>🖚 Resultaat:</strong><br>
         Eerste aankopen = €${Math.round(monthlyBaseRevenue * 12).toLocaleString('nl-NL')}<br>
         Herhaalomzet = €${Math.round(herhaalOmzet).toLocaleString('nl-NL')}<br>
