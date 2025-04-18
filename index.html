@@ -2,104 +2,163 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>DÉCAAR Omzet & CLV Calculator</title>
+  <title>DÉCAAR CLV & Omzet Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 900px;
+      max-width: 700px;
       margin: 40px auto;
       padding: 20px;
       border: 1px solid #ccc;
       border-radius: 12px;
       background-color: #f9f9f9;
     }
+    h1 {
+      text-align: center;
+    }
     label {
       display: block;
-      margin-top: 12px;
+      margin-top: 10px;
     }
     input {
       width: 100%;
-      padding: 6px;
+      padding: 8px;
       margin-top: 4px;
+      margin-bottom: 10px;
     }
-    .result {
+    .result, .baseline, .explanation, .steps {
       background-color: #e8f5e9;
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
     }
-    h1 {
-      text-align: center;
+    .baseline {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      font-weight: bold;
     }
-    h2 {
-      margin-top: 30px;
+    .explanation, .steps {
+      background-color: #eef;
+      font-weight: normal;
+      font-size: 14px;
     }
-    .bold { font-weight: bold; }
+    .steps strong {
+      display: block;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <h1>DÉCAAR Omzet & CLV Calculator</h1>
 
-  <h2>📊 Huidige situatie (2024)</h2>
-  <p>
-    🧑‍💻 <strong>Unieke B2C klanten:</strong> 1.306<br>
-    🛒 <strong>Aantal B2C orders:</strong> 2.020<br>
-    💶 <strong>Gemiddelde orderwaarde:</strong> €75<br>
-    💰 <strong>Totaal B2C omzet:</strong> €151.500<br>
-    🔁 <strong>Gemiddeld aantal aankopen per klant:</strong> 1,55<br>
-    📉 <strong>CLV (Customer Lifetime Value):</strong> €116
-  </p>
+  <div class="baseline">
+    <h3>📌 Huidige situatie (2024)</h3>
+    B2C orders per jaar: 2.020<br>
+    B2C klanten per jaar: 1.306<br>
+    Gem. aantal aankopen per klant per jaar: 1,55<br>
+    Gemiddelde orderwaarde: €75,00<br>
+    Totale B2C omzet per jaar: €151.500<br>
+    Actieve gebruikers per jaar: 54.000<br>
+    Actieve gebruikers per maand: 4.500<br>
+    Nieuwe gebruikers per jaar: 36.000<br>
+    Nieuwe gebruikers per maand: 3.000<br>
+    Conversiepercentage B2C: ≈ 5,6% (2.020 bestellingen gedeeld door 36.000 nieuwe gebruikers)<br>
+    <em>Toelichting: omdat de meeste nieuwe gebruikers consumenten zijn, gebruiken we dit als benadering voor het B2C-conversiepercentage.</em>
+  </div>
 
-  <h2>🔭 Groeiscenario: richting €300.000 omzet</h2>
   <label>Bezoekers per maand:
     <input type="number" id="visitors" value="6000">
   </label>
   <label>Conversiepercentage (%):
-    <input type="number" id="conversion" value="5.6">
+    <input type="number" id="conversion" step="0.1" value="5.6">
   </label>
   <label>Gemiddelde orderwaarde (€):
     <input type="number" id="aov" value="90">
   </label>
-  <label>Gemiddeld aantal aankopen per klant per jaar:
-    <input type="number" id="orders_per_customer" value="1.67">
+  <label>Gemiddeld aantal aankopen per klant (per jaar):
+    <input type="number" id="frequency" step="0.01" value="1.67">
   </label>
 
   <div class="result" id="output"></div>
+  <div class="explanation" id="explanation"></div>
+  <div class="steps" id="steps"></div>
 
   <script>
     const inputs = document.querySelectorAll("input");
     const output = document.getElementById("output");
+    const explanation = document.getElementById("explanation");
+    const steps = document.getElementById("steps");
 
-    function calculateCLV() {
-      const visitors = parseFloat(document.getElementById("visitors").value);
-      const conversion = parseFloat(document.getElementById("conversion").value) / 100;
+    function calculate() {
+      const monthlyVisitors = parseFloat(document.getElementById("visitors").value);
+      const conversionRate = parseFloat(document.getElementById("conversion").value) / 100;
       const aov = parseFloat(document.getElementById("aov").value);
-      const ordersPerCustomer = parseFloat(document.getElementById("orders_per_customer").value);
+      const frequency = parseFloat(document.getElementById("frequency").value);
 
-      const monthlyOrders = visitors * conversion;
-      const yearlyOrders = monthlyOrders * 12;
-      const yearlyRevenue = yearlyOrders * aov;
-      const yearlyCustomers = yearlyOrders / ordersPerCustomer;
-      const clv = aov * ordersPerCustomer;
+      const monthlyNewCustomers = monthlyVisitors * conversionRate;
+      const monthlyBaseRevenue = monthlyNewCustomers * aov;
+      const totalUniqueCustomers = monthlyNewCustomers * 12;
+
+      let totalOrders = 0;
+      let totalRevenue = 0;
+
+      for (let month = 1; month <= 12; month++) {
+        const activeCustomers = (month <= 9) ? monthlyNewCustomers * frequency : monthlyNewCustomers;
+        totalOrders += activeCustomers;
+        totalRevenue += activeCustomers * aov;
+      }
+
+      const clv = aov * frequency;
+      const herhaalOmzet = totalRevenue - (monthlyBaseRevenue * 12);
+      const extraOrders = Math.round(monthlyNewCustomers * (frequency - 1) * 9);
 
       output.innerHTML = `
-        <h3>📈 Jaarresultaten (op basis van invoer)</h3>
-        🛒 <strong>Aantal orders per jaar:</strong> ${Math.round(yearlyOrders).toLocaleString('nl-NL')}<br>
-        💶 <strong>Totaalomzet:</strong> €${Math.round(yearlyRevenue).toLocaleString('nl-NL')}<br>
-        👥 <strong>Unieke klanten per jaar:</strong> ${Math.round(yearlyCustomers).toLocaleString('nl-NL')}<br>
-        💡 <strong>CLV per klant:</strong> €${clv.toFixed(2)}<br><br>
+        Jaaromzet (incl. herhaal): €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
+        Jaaromzet uit eerste aankopen: €${Math.round(monthlyBaseRevenue * 12).toLocaleString('nl-NL')}<br>
+        Herhaalomzet per jaar: €${Math.round(herhaalOmzet).toLocaleString('nl-NL')}<br>
+        Totaal aantal orders per jaar: ${Math.round(totalOrders)}<br>
+        Unieke klanten/maand: ${Math.round(monthlyNewCustomers)}<br>
+        Totale unieke klanten/jaar: ${Math.round(totalUniqueCustomers)}<br>
+        CLV: €${clv.toFixed(2)}
+      `;
 
-        <h3>🧾 Huidige situatie (2024)</h3>
-        - 1.306 unieke B2C klanten<br>
-        - 2.020 B2C orders<br>
-        - Gem. orderwaarde: €75<br>
-        - CLV: €116<br>
-        - Totale omzet: €151.500
+      explanation.innerHTML = `
+        <strong>Berekening:</strong><br>
+        Elke maand komen ${monthlyVisitors} bezoekers, waarvan ${(conversionRate * 100).toFixed(2)}% converteert = ${Math.round(monthlyNewCustomers)} nieuwe klanten.<br>
+        Elke klant doet gemiddeld ${frequency} aankopen/jaar à €${aov}.<br>
+        In maand 1 t/m 9 telt ook het herhaalgedrag mee. Vanaf maand 10 alleen de eerste aankoop.<br>
+        Jaaromzet = som van alle bestellingen × orderwaarde.<br>
+        Herhaalomzet = totaal aantal extra aankopen × orderwaarde.<br>
+        Totale unieke klanten/jaar = nieuwe klanten/maand × 12<br>
+        Totaal aantal orders = alle aankopen in 12 maanden (inclusief herhaalaankopen)<br>
+        CLV = orderwaarde × aankopen per klant/jaar
+      `;
+
+      steps.innerHTML = `
+        <strong>✅ Stap voor stap uitleg:</strong>
+        <strong>1. Eerste aankopen berekenen:</strong>
+        Nieuwe klanten per maand = ${monthlyVisitors} × ${(conversionRate * 100).toFixed(1)}% = ${Math.round(monthlyNewCustomers)} klanten<br>
+        → ${Math.round(monthlyNewCustomers)} × €${aov} = €${Math.round(monthlyBaseRevenue).toLocaleString('nl-NL')} omzet per maand<br>
+        → €${Math.round(monthlyBaseRevenue).toLocaleString('nl-NL')} × 12 maanden = €${Math.round(monthlyBaseRevenue * 12).toLocaleString('nl-NL')} jaarlijkse omzet uit eerste aankopen<br><br>
+        <strong>2. Herhaalomzet berekenen:</strong>
+        Gem. extra bestellingen per klant: ${frequency} - 1 = ${(frequency - 1).toFixed(2)}<br>
+        Herhaalorders maanden 1-9: ${Math.round(monthlyNewCustomers)} × ${(frequency - 1).toFixed(2)} × 9 = ${extraOrders} extra bestellingen<br>
+        → ${extraOrders} × €${aov} = €${Math.round(herhaalOmzet).toLocaleString('nl-NL')} herhaalomzet<br><br>
+        <strong>3. Unieke klanten & CLV:</strong><br>
+        Totale unieke klanten/jaar = ${Math.round(monthlyNewCustomers)} × 12 = ${Math.round(totalUniqueCustomers)}<br>
+        Totaal aantal orders/jaar = ${Math.round(totalOrders)}<br>
+        CLV = €${aov} × ${frequency} = €${clv.toFixed(2)}<br><br>
+        <strong>💚 Resultaat:</strong><br>
+        Eerste aankopen = €${Math.round(monthlyBaseRevenue * 12).toLocaleString('nl-NL')}<br>
+        Herhaalomzet = €${Math.round(herhaalOmzet).toLocaleString('nl-NL')}<br>
+        Totaal = €${Math.round(totalRevenue).toLocaleString('nl-NL')}<br>
+        Dit komt overeen met wat de calculator berekent!
       `;
     }
 
-    inputs.forEach(input => input.addEventListener("input", calculateCLV));
-    calculateCLV();
+    inputs.forEach(input => input.addEventListener("input", calculate));
+    calculate();
   </script>
 </body>
 </html>
